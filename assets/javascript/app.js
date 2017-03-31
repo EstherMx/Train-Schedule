@@ -8,7 +8,8 @@ var config = {
   firebase.initializeApp(config);
 
 
-$( document ).ready(function() {
+var database = firebase.database();
+
 
 var train = '';
 var destination = '';
@@ -16,23 +17,23 @@ var firstTrain = '';
 var frequency = '';
 
 
-var dataRef = new Firebase("https://train-schedule-4139f.firebaseio.com/");
-
 
 //new train
 	$('#addTrainBtn').on('click', function() {
+
+		event.preventDefault();
 	  train = $('#trainNameInput').val().trim();
+	  console.log(train);
 		destination = $('#destinationInput').val().trim();
 		firstTrain = $('#firstTrainInput').val().trim();
 		frequency = $('#frequencyInput').val().trim();
 
-	// Empties Fields After Submitting Data
 		$('#trainNameInput').val('');
 		$('#destinationInput').val('');
 		$('#firstTrainInput').val('');
 		$('#frequencyInput').val('');
 
-		firebase.database().ref.push({
+		database.ref().push({
 
 			train: train,
 			destination: destination,
@@ -41,7 +42,6 @@ var dataRef = new Firebase("https://train-schedule-4139f.firebaseio.com/");
 
 		});
 
-		return false;
 
 
 
@@ -49,13 +49,7 @@ var dataRef = new Firebase("https://train-schedule-4139f.firebaseio.com/");
 
 // Child Added 
 
-		dataRef.on("child_added", function(snapshot) {
-
-		console.log(snapshot.val().train + " = train");
-		console.log(snapshot.val().destination + " = destination");
-		console.log(snapshot.val().firstTrain + " = nextTrain");
-		console.log(snapshot.val().frequency +" = frequency");
-
+		database.ref().on("child_added", function(snapshot) {
 		
 		var train = snapshot.val().train;
 		var destination = snapshot.val().destination;
@@ -86,7 +80,6 @@ var dataRef = new Firebase("https://train-schedule-4139f.firebaseio.com/");
 			var minAway = ftMoment - timeMoment;
 		};
 
-	// Appends new information to table
 	$("#trainData").append("<tr><td>" + train + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + nextArrival + "</td><td>" + minAway + "</td></tr>");
 
 			}, function (errorObject) {
@@ -94,4 +87,3 @@ var dataRef = new Firebase("https://train-schedule-4139f.firebaseio.com/");
 
 		}); 
 
-});
